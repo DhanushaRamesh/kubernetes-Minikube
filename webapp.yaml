@@ -1,0 +1,57 @@
+#Deployment file for Web application
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  labels:
+    app: webapp           #Make sure the labels are matching 
+spec:
+  replicas: 1             #For DB if you want to do a replica you need to use statefullset kind 
+  selector:
+    matchLabels:
+      app: webapp
+  template:               #Configuration or Pod 
+    metadata:
+      labels:
+        app: webapp
+    spec:
+      containers:         #Can have one or more containers in a pod
+      #Creating Pods with web image created in docker (docker pull nanajanashia/k8s-demo-app:v1.0)
+      - name: webapp
+        image: nanajanashia/k8s-demo-app:v1.0
+        ports:
+        - containerPort: 3000    #Its a nodejs app so using nodejs port
+        env:
+        - name: USER_NAME          #This Web-application conatiner uses this name to read user
+          valueFrom:
+            secretKeyRef:          #Extracting cred from secrets file
+              name: mongo-secret
+              key: mongo-user
+        - name: USER_PWD           #This Web-application conatiner uses this name to read pwd
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+        - name: DB_URL             #This Web-application conatiner uses this name to read DB URL
+          valueFrom:
+            configMapKeyRef:       #Extracting cred from ConfigMap file
+              name: mongo-config
+              key: mongo-url
+
+---
+# Service File for Web Application 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service    #The service name is used for pod to communicate with each other
+spec:
+  type: NodePort       #To connect to external website
+  selector:            #select pods to forward request to the application
+    app: webapp        #Same as application label
+  ports:
+    - protocol: TCP
+      port: 3000          #Port can be same as target port
+      targetPort: 3000    #Target port of <web> applicaton
+      nodePort: 30100     #NodePort ranges from 30K-32767

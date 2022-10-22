@@ -1,0 +1,48 @@
+#Deployment file for Mongo DB application
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  labels:
+    app: mongo-db         #Make sure the labels are matching 
+spec:
+  replicas: 1             #For DB if you want to do a replica you need to use statefullset kind 
+  selector:
+    matchLabels:
+      app: mongo-db
+  template:               #Configuration or Pod 
+    metadata:
+      labels:
+        app: mongo-db
+    spec:
+      containers:         #Can have one or more containers in a pod
+      #Creating Pods with mongo:5.0 image
+      - name: mongodb
+        image: mongo:5.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME    #MongoDB application expects these env var for user/pwd
+          valueFrom:
+            secretKeyRef:                     #Extracting cred from secrets file
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+---
+# Service File for MongoDB 
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service    #The service name should match the DB endpoint provided in config file
+spec:
+  selector:              #select pods to forward request to the application
+    app: mongo-db        #Same as application label
+  ports:
+    - protocol: TCP
+      port: 27017          #Port can be same as target port
+      targetPort: 27017    #Target port of <mongoDb> applicaton

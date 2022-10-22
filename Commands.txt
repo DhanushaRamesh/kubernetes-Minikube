@@ -1,0 +1,13 @@
+1. minikube start --driver docker
+2. minikube status
+3. kubectl get node
+4. kubectl apply -f <filename>  #Execute all the yaml files
+5. kubectl get all 
+6. kubectl get configMap/secret
+7. kubectl get pod
+8. kubectl describe pod <pod-name>
+9. kubectl get svc  (or) kubectl get svc -o wide
+10. minikube ip
+11. <minikube-ip:NodePort> --> to access application from external website
+12. kubectl delete pods <pod-name>
+13. minikube stop  

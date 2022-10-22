@@ -1,0 +1,127 @@
+
+PS D:\Learning\Kubernetes> minikube status
+minikube
+type: Control Plane
+host: Running
+kubelet: Running
+apiserver: Running
+kubeconfig: Configured
+
+PS D:\Learning\Kubernetes> kubectl get all
+NAME                 TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
+service/kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   82m
+
+PS D:\Learning\Kubernetes> kubectl get node
+configmap/mongo-config created
+
+PS D:\Learning\Kubernetes> kubectl apply -f mongo-secret.yaml
+secret/mongo-secret created
+
+PS D:\Learning\Kubernetes> kubectl apply -f mongo-db.yaml
+deployment.apps/mongo-deployment created
+service/mongo-service unchanged
+
+PS D:\Learning\Kubernetes> kubectl apply -f webapp.yaml
+deployment.apps/web-deployment unchanged
+service/web-service created
+
+PS D:\Learning\Kubernetes> kubectl get node         NAME       STATUS   ROLES           AGE   VERSION
+minikube   Ready    control-plane   90m   v1.25.2   
+
+PS D:\Learning\Kubernetes> kubectl get all 
+NAME                                    READY   STATUS    RESTARTS   AGE
+pod/mongo-deployment-67b6dc9ff7-dnqvk   1/1     Running   0          3m14s
+pod/web-deployment-65d4754f9d-rpfhk     1/1     Running   0          2m56s
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/mongo-deployment   1/1     1            1           3m14s
+deployment.apps/web-deployment     1/1     1            1           2m57s
+NAME                               READY   UP-TO-DATE   AVAILABLE   AGEdeployment.apps/mongo-deployment   1/1     1            1           3m14sdeployment.apps/web-deployment     1/1     1            1           2m57s
+
+NAME                                          DESIRED   CURRENT   READY   AGE
+replicaset.apps/mongo-deployment-67b6dc9ff7   1         1         1       3m14s
+replicaset.apps/web-deployment-65d4754f9d     1         1         1       2m56s
+
+PS D:\Learning\Kubernetes> kubectl get configMap
+NAME               DATA   AGE
+
+PS D:\Learning\Kubernetes> kubectl get secret
+NAME           TYPE     DATA   AGE
+mongo-secret   Opaque   2      7m11s
+
+PS D:\Learning\Kubernetes> kubectl get pod
+NAME                                READY   STATUS    RESTARTS   AGE
+mongo-deployment-67b6dc9ff7-dnqvk   1/1     Running   0          4m51s
+web-deployment-65d4754f9d-rpfhk     1/1     Running   0          4m33s
+PS D:\Learning\Kubernetes> kubectl describe pod web-deployment-65d4754f9d-rpfhk
+Name:             web-deployment-65d4754f9d-rpfhk
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             minikube/192.168.49.2
+Start Time:       Sat, 22 Oct 2022 16:40:38 +0530
+Labels:           app=webapp
+                  pod-template-hash=65d4754f9d
+Annotations:      <none>
+Status:           Running
+IP:               172.17.0.4
+IPs:
+  IP:           172.17.0.4
+Controlled By:  ReplicaSet/web-deployment-65d4754f9d
+Containers:
+  webapp:
+    Container ID:   docker://faad3e48a18d85309f9d527d5740e6c63a8f928a1090de11e9e4f48bafb90372
+    Image:          nanajanashia/k8s-demo-app:v1.0
+    Image ID:       docker-pullable://nanajanashia/k8s-demo-app@sha256:6f554135da39ac00a1c2f43e44c2b0b54ca13d3d8044da969361e7781adb7f95    
+    Port:           3000/TCP
+    Host Port:      0/TCP
+    State:          Running
+      Started:      Sat, 22 Oct 2022 16:42:25 +0530
+    Ready:          True
+    Restart Count:  0
+    Environment:
+      USER_NAME:  <set to the key 'mongo-user' in secret 'mongo-secret'>      Optional: false
+      USER_PWD:   <set to the key 'mongo-password' in secret 'mongo-secret'>  Optional: false
+      DB_URL:     <set to the key 'mongo-url' of config map 'mongo-config'>   Optional: false
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-dsqw4 (ro)
+Conditions:
+  Type              Status
+  Initialized       True
+  Ready             True
+  ContainersReady   True
+  PodScheduled      True
+Volumes:
+  kube-api-access-dsqw4:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    ConfigMapOptional:       <nil>
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type    Reason     Age    From               Message
+  ----    ------     ----   ----               -------
+  Normal  Scheduled  6m14s  default-scheduler  Successfully assigned default/web-deployment-65d4754f9d-rpfhk to minikube
+  Normal  Pulling    6m13s  kubelet            Pulling image "nanajanashia/k8s-demo-app:v1.0"
+  Normal  Pulled     4m27s  kubelet            Successfully pulled image "nanajanashia/k8s-demo-app:v1.0" in 1m45.621559761s
+  Normal  Created    4m27s  kubelet            Created container webapp
+  Normal  Started    4m27s  kubelet            Started container webapp
+
+PS D:\Learning\Kubernetes> kubectl get svc
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP          95m
+mongo-service   ClusterIP   10.99.218.167   <none>        27017/TCP        9m58s
+web-service     NodePort    10.98.169.33    <none>        3000:30100/TCP   5m5s
+
+PS D:\Learning\Kubernetes> minikube ip
+192.168.49.2
+
+PS D:\Learning\Kubernetes> kubectl get svc -o wide
+NAME            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE     SELECTOR
+kubernetes      ClusterIP   10.96.0.1       <none>        443/TCP          97m     <none>
+mongo-service   ClusterIP   10.99.218.167   <none>        27017/TCP        12m     app=mongo-db
+web-service     NodePort    10.98.169.33    <none>        3000:30100/TCP   7m21s   app=webapp
+

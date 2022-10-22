@@ -1,0 +1,7 @@
+#To store Mango-DB URL endpoint
+apiVersion: v1
+kind: ConfigMap             #this file is configmap 
+metadata:
+  name: mongo-config        
+data:                       #define the config details in key-value pairs
+  mongo-url: mongo-service   #This is a service name which describe the endpoint of DB
