@@ -9,4 +9,6 @@
   4. Please refer to the output.txt file where commands are executed if you have any concerns.
 
 ## Architecture
-  <img width="593" alt="image" src="https://user-images.githubusercontent.com/48701982/197338888-b9687b22-0074-4b20-8beb-13f27300649d.png">
+  <img width="695" alt="image" src="https://user-images.githubusercontent.com/48701982/197339191-45b14126-80ec-4ee9-82d6-cdfdd45d358e.png">
+
+Please Note, You can have deployment and service file seperately too. 
